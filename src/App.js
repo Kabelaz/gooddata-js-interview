@@ -10,6 +10,14 @@ const dateAttributeInMonths = '/gdc/md/xms7ga4tf3g3nzucd8380o2bev8oeknp/obj/2142
 const dateAttribute = '/gdc/md/xms7ga4tf3g3nzucd8380o2bev8oeknp/obj/2180';
 
 class App extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+          month: 1,
+          lastDay: 31,
+          year: 2016
+        };
+      }
 
     getMonthFilter() {
         return {
@@ -17,10 +25,16 @@ class App extends Component {
                 dataSet: {
                     uri: dateAttribute
                 },
-                from: '2016-01-01',
-                to: '2016-01-31'
+                from: `${this.state.year}-${this.state.month}-01`,
+                to: `${this.state.year}-${this.state.month}-${this.state.lastDay}`
             }
 
+        }
+    }
+
+    setMonth = (event) => {
+        if(event){
+            this.setState({ month: event.target.value, lastDay: new Date(this.state.year, event.target.value, 0).getDate()})
         }
     }
 
@@ -56,7 +70,7 @@ class App extends Component {
 
     renderDropdown() {
         return (
-            <select defaultValue="1">
+            <select defaultValue="1" onChange={this.setMonth}>
                 <option value="1">January</option>
                 <option value="2">February</option>
                 <option value="3">March</option>
