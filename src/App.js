@@ -1,119 +1,102 @@
 // Copyright (C) 2007-2019, GoodData(R) Corporation. All rights reserved.
 
-import React, { Component } from 'react';
-import '@gooddata/react-components/styles/css/main.css';
+import React, { Component } from "react";
+import "@gooddata/react-components/styles/css/main.css";
 
-import { ColumnChart } from '@gooddata/react-components';
+import SingleMonthChart from "./components/single-month-chart";
+import AllMonthsChart from "./components/all-months-chart";
 
-const grossProfitMeasure = '/gdc/md/xms7ga4tf3g3nzucd8380o2bev8oeknp/obj/6877';
-const dateAttributeInMonths = '/gdc/md/xms7ga4tf3g3nzucd8380o2bev8oeknp/obj/2142';
-const dateAttribute = '/gdc/md/xms7ga4tf3g3nzucd8380o2bev8oeknp/obj/2180';
+const grossProfitMeasure = "/gdc/md/xms7ga4tf3g3nzucd8380o2bev8oeknp/obj/6877";
+const dateAttributeInMonths =
+  "/gdc/md/xms7ga4tf3g3nzucd8380o2bev8oeknp/obj/2142";
+const dateAttribute = "/gdc/md/xms7ga4tf3g3nzucd8380o2bev8oeknp/obj/2180";
 
 class App extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-          month: 1,
-          lastDay: 31,
-          year: 2016
-        };
-      }
+  constructor(props) {
+    super(props);
+    this.state = {
+      month: 1,
+      lastDay: 31,
+      year: 2016,
+    };
+  }
 
-    getMonthFilter() {
-        return {
-            absoluteDateFilter: {
-                dataSet: {
-                    uri: dateAttribute
-                },
-                from: `${this.state.year}-${this.state.month}-01`,
-                to: `${this.state.year}-${this.state.month}-${this.state.lastDay}`
-            }
+  getMonthFilter() {
+    return {
+      absoluteDateFilter: {
+        dataSet: {
+          uri: dateAttribute,
+        },
+        from: `${this.state.year}-${this.state.month}-01`,
+        to: `${this.state.year}-${this.state.month}-${this.state.lastDay}`,
+      },
+    };
+  }
 
-        }
+  setMonth = (event) => {
+    if (event) {
+      this.setState({
+        month: event.target.value,
+        lastDay: new Date(this.state.year, event.target.value, 0).getDate(),
+      });
     }
+  };
 
-    setMonth = (event) => {
-        if(event){
-            this.setState({ month: event.target.value, lastDay: new Date(this.state.year, event.target.value, 0).getDate()})
-        }
-    }
+  getMeasures() {
+    return [
+      {
+        measure: {
+          localIdentifier: "m1",
+          definition: {
+            measureDefinition: {
+              item: {
+                uri: grossProfitMeasure,
+              },
+            },
+          },
+          alias: "$ Gross Profit",
+        },
+      },
+    ];
+  }
 
-    getMeasures() {
-        return [
-            {
-                measure: {
-                    localIdentifier: 'm1',
-                    definition: {
-                        measureDefinition: {
-                            item: {
-                                uri: grossProfitMeasure
-                            }
-                        }
-                    },
-                    alias: '$ Gross Profit'
-                }
-            }
-        ]
-    }
+  getViewBy() {
+    return {
+      visualizationAttribute: {
+        displayForm: {
+          uri: dateAttributeInMonths,
+        },
+        localIdentifier: "a1",
+      },
+    };
+  }
 
-    getViewBy() {
-        return {
-            visualizationAttribute:
-            {
-                displayForm: {
-                    uri: dateAttributeInMonths
-                },
-                localIdentifier: 'a1'
-            }
-        }
-    }
+  render() {
+    const projectId = "xms7ga4tf3g3nzucd8380o2bev8oeknp";
+    const filters = [this.getMonthFilter()];
+    const measures = this.getMeasures();
+    const viewBy = this.getViewBy();
 
-    renderDropdown() {
-        return (
-            <select defaultValue="1" onChange={this.setMonth}>
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-            </select>
-        )
-    }
-
-    render() {
-        const projectId = 'xms7ga4tf3g3nzucd8380o2bev8oeknp';
-        const filters = [this.getMonthFilter()];
-        const measures = this.getMeasures();
-        const viewBy = this.getViewBy();
-
-        return (
-            <div className="App">
-                <h1>$ Gross Profit in month {this.renderDropdown()} 2016</h1>
-                <div>
-                    <ColumnChart
-                        measures={measures}
-                        filters={filters}
-                        projectId={projectId}
-                    />
-                </div>
-                <h1>$ Gross Profit - All months</h1>
-                <div>
-                    <ColumnChart
-                        measures={measures}
-                        viewBy={viewBy}
-                        projectId={projectId}
-                    />
-                </div>
-            </div>
-        );
-    }
+    return (
+      <div className="App">
+        <SingleMonthChart
+          className="SingleMonthChart"
+          measures={measures}
+          filters={filters}
+          projectId={projectId}
+          title={"$ Gross Profit in month"}
+          onMonthChange={this.setMonth}
+        />
+        <AllMonthsChart
+          className="AllMonthsChart"
+          title="$ Gross Profit - All months"
+          measures={measures}
+          viewBy={viewBy}
+          projectId={projectId}
+        />
+      </div>
+    );
+  }
 }
 
 export default App;
